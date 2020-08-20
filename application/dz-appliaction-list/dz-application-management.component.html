@@ -1,0 +1,137 @@
+<div [ngClass]="{'card': !dashboardView}">
+    <div  [ngClass]="{'card-body': !dashboardView}">
+        <div class="c3-table-scroll">
+        
+        <mat-card-content>
+        <mat-table [dataSource]="dataSource" matSort class="management-table c3-table"> 
+            <ng-container matColumnDef="name">
+                <mat-header-cell *matHeaderCellDef >
+                    <ng-container *ngIf="!dashboardView ; else otherName">
+                        <div mat-sort-header>{{"name" | translate}}</div>
+                        <mat-form-field >
+                            <input matInput 
+                                   ngModel (ngModelChange)="filterBy('name', Operator.CONTAINS, $event)">
+                        </mat-form-field>    
+                    </ng-container>
+                    <ng-template #otherName>
+                        <div>{{"name" | translate}}</div>
+                    </ng-template>
+                </mat-header-cell>
+                <mat-cell *matCellDef="let application">
+                   <a [href]="application.url" target="_blank">{{application.name}}</a> 
+                </mat-cell>
+            </ng-container>
+ 
+            <ng-container matColumnDef="description">
+                <mat-header-cell *matHeaderCellDef>
+                    <ng-container *ngIf="!dashboardView ; else otherDescription">
+                        <div mat-sort-header>{{"description" | translate}}</div>
+                    <mat-form-field>
+                        <input matInput 
+                               ngModel (ngModelChange)="filterBy('description', Operator.CONTAINS, $event)">
+                    </mat-form-field>
+                    </ng-container>
+                    <ng-template #otherDescription>
+                        <div>{{"description" | translate}}</div>
+                    </ng-template>
+                    
+                </mat-header-cell>
+                <mat-cell *matCellDef="let application">{{application.description}}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="url">
+                <mat-header-cell *matHeaderCellDef>
+                    <div mat-sort-header>URL</div>
+                    <mat-form-field>
+                        <input matInput 
+                               ngModel (ngModelChange)="filterBy('url', Operator.CONTAINS, $event)">
+                    </mat-form-field>
+                </mat-header-cell>
+                <mat-cell *matCellDef="let application">{{application.url}}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="horizon">
+                <mat-header-cell *matHeaderCellDef>
+                    <div mat-sort-header>Horizon</div>
+                </mat-header-cell>
+                <mat-cell *matCellDef="let application">
+                    {{(application.horizon ? "horizon" : "simple") | translate}}
+                </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="applicationGroups">
+                <mat-header-cell *matHeaderCellDef>
+                    {{"applicationGroups" | translate}}
+                    <dz-autocomplete class="paddingR10"
+                            [searchFunction]="applicationGroupService.appGroupsSearch"
+                            [searchPlaceholder]="'nameOrCid' | translate"
+                            ngModel (ngModelChange)="filterByMultiple('applicationGroups', $event)"
+                            [displayWith]="applicationGroupService.applicationGroupToString"
+                            [multiple]="true">
+                    </dz-autocomplete>
+                </mat-header-cell>
+                <mat-cell *matCellDef="let application">
+                    {{applicationGroupService.applicationGroupsToString(application.applicationGroups)}}
+                </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="owner">
+                <mat-header-cell *matHeaderCellDef>
+                    <div mat-sort-header="owner.name">{{"owner" | translate}}</div>
+                    <dz-autocomplete *ngIf="!auth.isOrganizationAdmin()"
+                        [searchFunction]="organizationsSearchFunction"
+                        [searchPlaceholder]="'nameOrCid' | translate"
+                        [enableToClear]="true"
+                        ngModel (ngModelChange)="filterBy('owner', Operator.EQUAL, $event?.organizationId)"
+                        [displayWith]="organizationService2.orgnaizationToString">     
+                </dz-autocomplete>
+                </mat-header-cell>
+                <mat-cell *matCellDef="let application">{{application.owner.name}}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+                <mat-header-cell *matHeaderCellDef>
+                    {{"Actions"}}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let application">
+                    <button mat-icon-button [matMenuTriggerFor]="menu" 
+                    *ngIf="application.editable"
+                            class="row-menu-button">
+                        <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menu="matMenu" [overlapTrigger]="false">
+                        <button mat-menu-item (click)="openEditDialog(application)">
+                            <mat-icon>edit</mat-icon>{{"edit" | translate}}
+                        </button>
+                        <button mat-menu-item (click)="confirmDeletion(application,'applicationDeleteConfirmation',{name:application.name})">
+                            <mat-icon>delete</mat-icon>{{"delete" | translate}}
+                        </button>
+                    </mat-menu>
+                </mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="columns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: columns;"></mat-row>
+        </mat-table>
+        <ng-container *ngIf="totalElements === 0">
+            <div class="no-record text-center">
+                {{"No Record found"}}
+            </div>
+        </ng-container>
+        <mat-paginator showFirstLastButtons #paginator [ngClass]="{'height-zero': dashboardView}"
+                       [pageSize]="pageSize"
+                       [pageSizeOptions]="[15, 30, 45, 60]"
+                       [length]="totalElements">
+        </mat-paginator>
+        <div *ngIf="dashboardView && auth.globalRoles[permission[permission.READ_APPLICATIONS]]">
+            <span 
+            [routerLink]="['/appliances/applications/configure']"
+             [queryParams]="{'navigation':true}" class="primary-color link pointer">Manage All</span>
+        </div>
+    </mat-card-content>
+   
+    </div> </div>
+</div>
+   
+
+

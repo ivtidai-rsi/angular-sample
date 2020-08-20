@@ -1,0 +1,42 @@
+<div class="card">
+  <div class="card-body">
+    <dz-form [formGroup]="form" (onSubmit)="save()" class="edit-entity-form">
+  <div class="xs-form-wraper" fxLayout="row wrap" fxLayoutGap="2%" >
+    <mat-form-field  fxFlex="33">
+        <mat-label> Name *</mat-label>
+      <input matInput  formControlName="name" > 
+      <mat-error *ngIf="form.controls['name'].hasError('maxlength')">
+        <div>Name can't be more than 255 characters</div>
+      </mat-error>     
+    </mat-form-field>
+    <mat-form-field  fxFlex="33">
+        <mat-label> Description </mat-label>
+      <input matInput  formControlName="description">
+      <mat-error *ngIf="form.controls['description'].hasError('maxlength')">
+            <div>Description can't be more than 255 characters</div>
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field  fxFlex="33">
+        <mat-label> URL *</mat-label>
+      <input matInput  formControlName="url"  >
+      <mat-error *ngIf="form.controls['url'].hasError('maxlength')">
+        <div>URL can't be more than 255 characters</div>
+      </mat-error>
+      <mat-error class="error" *ngIf="url.value && url.invalid">
+        {{" URL format should be like http://example.com"}}
+    </mat-error>
+    </mat-form-field>
+   <dz-autocomplete fxFlex="33" [searchFunction]="applicationGroupService.appGroupsForEditingSearch" [placeholder]="'applicationGroups' | translate"
+      [searchPlaceholder]="'search' | translate" [displayWith]="applicationGroupService.applicationGroupToString" formControlName="applicationGroups"
+      [multiple]="true" [required]="true">
+    </dz-autocomplete>
+    <div fxFlex="33"> <mat-checkbox formControlName="horizon">Horizon</mat-checkbox> </div>
+  </div>
+  <div mat-dialog-actions class="marginT10">
+    <button class="btn btn-primary" mat-button>{{'save' | translate}}</button>&nbsp;
+    <button class="btn btn-default" type="button" (click)="redirectToParent()" mat-button> {{"cancel" | translate}}</button>
+  </div>
+</dz-form>
+  </div>
+</div>
+

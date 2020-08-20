@@ -1,0 +1,6 @@
+
+<div class="detailpage-back" *ngIf="hasQueryParams">
+    <a  [routerLink]="['/dashboard']" style="color: #fea01c;"><em class="material-icons">keyboard_arrow_left</em> Back</a>
+</div>
+<app-tabed-list [config-tabs]="configPath"></app-tabed-list>
+<router-outlet></router-outlet>
